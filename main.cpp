@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
+#include <ctime>
 
 struct Credential
 {
@@ -11,7 +12,7 @@ struct Credential
 };
 
 
-void loadCredentialDatabase()
+void createCredentialDatabase()
 {
     std::fstream vaultFile;
     vaultFile.open("vault.csv");
@@ -20,7 +21,9 @@ void loadCredentialDatabase()
         std::ofstream Database("vault.csv"); //create the database
         Database << "service,username,password\n";
         Database.close();
+        std::cout << "Created database successfully\n";
     }
+    std::cout << "Database Loaded :)\n";
 }
 
 
@@ -30,10 +33,10 @@ void saveCredentialsToDatabase(std::vector<Credential>& creds)
     {
         std::ofstream vaultFile("vault.csv", std::ios::trunc);
 
-        for (const auto& [service, username, password] : creds) {
+        for (const auto& [service, username, password] : creds)
+        {
             vaultFile << service << "," << username << "," << password << "\n";
         }
-
 
         vaultFile.close();
     }
@@ -58,8 +61,6 @@ void addCredentialEntryToMem(std::vector<Credential>& creds)
         std::getline(std::cin, cred.password);
 
         creds.push_back(cred);
-
-        saveCredentialsToDatabase(creds);
     }
     catch(...)
     {
@@ -70,26 +71,42 @@ void addCredentialEntryToMem(std::vector<Credential>& creds)
 
 void loadCredentialDatabase(std::vector<Credential>& creds)
 {
-    std::ifstream vaultFile("vault.csv");
-    std::string currLine;
+    try{
+        std::ifstream vaultFile("vault.csv");
+        std::string currLine;
 
-    while (std::getline(vaultFile, currLine)){
-        std::stringstream ss(currLine);
+        while (std::getline(vaultFile, currLine)){
+            std::stringstream ss(currLine);
 
-        Credential cred;
+            Credential cred;
 
-        std::getline(ss, cred.service, ',');
-        std::getline(ss, cred.username, ',');
-        std::getline(ss, cred.password, ',');
+            std::getline(ss, cred.service, ',');
+            std::getline(ss, cred.username, ',');
+            std::getline(ss, cred.password, ',');
 
-        creds.push_back(cred);
+            creds.push_back(cred);
+
+        }
+    }catch(...){
+    std::cout << "Credential Update Error";
     }
+}
 
+void viewCredentials(std::vector<Credential>& creds){
+    for (const auto& [service, username, password] : creds) {
+    std::cout << service << "," << username << "," << password << "\n";
+    }
+    if (creds.empty()) {
+    std::cout << "Nothing stored Yet" << std::endl;
+    }
 }
 
 int main()
 {
     std::vector<Credential> creds;
+
+    createCredentialDatabase();
+    loadCredentialDatabase(creds);
 
     int sel;
     do
@@ -99,13 +116,16 @@ int main()
         std::cout << "3. Save and Exit\n";
         std::cout << "Select an option: ";
         std::cin >> sel;
+        std::cin.ignore();
         switch (sel)
             {
             case 1: addCredentialEntryToMem(creds); break;
-            case 2: loadCredentialDatabase(creds); break;
+            case 2: viewCredentials(creds); break;
             default: std::cout << "Choose a valid option\n";
             }
     } while (sel!=3);
+
+    saveCredentialsToDatabase(creds);
 
     return 0;
 }
