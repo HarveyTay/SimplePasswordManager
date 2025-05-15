@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef VAULT_H
 #define VAULT_H
 
@@ -9,5 +11,6 @@ void saveCredentialsToDatabase(std::vector<Credential>& creds);
 void addCredentialEntryToMem(std::vector<Credential>& creds);
 void loadCredentialDatabase(std::vector<Credential>& creds);
 void viewCredentials(std::vector<Credential>& creds);
+void xorEncryptionDecryption(std::string);
 
 #endif //VAULT_H

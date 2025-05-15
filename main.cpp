@@ -2,7 +2,7 @@
 #include <iostream>
 #include <vector>
 
-#include "vault.cpp"
+#include "vault.h"
 
 
 int main()

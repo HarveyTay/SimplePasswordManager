@@ -1,9 +1,10 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <limits>
 
 #include "vault.h"
+
+#include <string.h>
 
 void createCredentialDatabase()
 {
@@ -28,6 +29,9 @@ void saveCredentialsToDatabase(std::vector<Credential>& creds)
 
         for (const auto& [service, username, password] : creds)
         {
+            xorEncryptionDecryption(service);
+            xorEncryptionDecryption(username);
+            xorEncryptionDecryption(password);
             vaultFile << service << "," << username << "," << password << "\n";
         }
 
@@ -87,9 +91,22 @@ void loadCredentialDatabase(std::vector<Credential>& creds)
 
 void viewCredentials(std::vector<Credential>& creds){
     for (const auto& [service, username, password] : creds) {
+        xorEncryptionDecryption(service);
+        xorEncryptionDecryption(username);
+        xorEncryptionDecryption(password);
     std::cout << service << "," << username << "," << password << "\n";
     }
     if (creds.empty()) {
     std::cout << "Nothing stored Yet" << std::endl;
+    }
+}
+
+void xorEncryption(std::string input)
+{
+    std::string password = "password";
+
+    for (int i = 0; i < input.length(); i++)
+    {
+        input[i] = input[i] ^ password[i];
     }
 }
