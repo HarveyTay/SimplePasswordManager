@@ -7,10 +7,21 @@
 
 int main()
 {
+
+    std::string key = "Password";
+
+    std::cout << "Enter Database Key:";
+
+    //std::getline(std::cin, key);
+
+
+
+
     std::vector<Credential> creds;
 
     createCredentialDatabase();
-    loadCredentialDatabase(creds);
+    loadCredentialDatabase(creds, key);
+
 
     int sel;
     do
@@ -29,7 +40,8 @@ int main()
             }
     } while (sel!=3);
 
-    saveCredentialsToDatabase(creds);
+
+    saveCredentialsToDatabase(creds, key);
 
     return 0;
 }
