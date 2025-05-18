@@ -4,7 +4,6 @@
 
 #include "vault.h"
 
-#include <string.h>
 
 void createCredentialDatabase()
 {
@@ -21,18 +20,18 @@ void createCredentialDatabase()
 }
 
 
-void saveCredentialsToDatabase(std::vector<Credential>& creds)
+void saveCredentialsToDatabase(std::vector<Credential>& creds, std::string key)
 {
     try
     {
         std::ofstream vaultFile("vault.csv", std::ios::trunc);
 
-        for (const auto& [service, username, password] : creds)
+        for (auto& [service, username, password] : creds)
         {
-            xorEncryptionDecryption(service);
-            xorEncryptionDecryption(username);
-            xorEncryptionDecryption(password);
-            vaultFile << service << "," << username << "," << password << "\n";
+            std::string encryptedService = xorEncryptionDecryption(service, key);
+            std::string encryptedUser = xorEncryptionDecryption(username, key);
+            std::string encryptedPassword = xorEncryptionDecryption(password, key);
+            vaultFile << encryptedService << "," << encryptedUser << "," << encryptedPassword << "\n";
         }
 
         vaultFile.close();
@@ -66,20 +65,25 @@ void addCredentialEntryToMem(std::vector<Credential>& creds)
 
 }
 
-void loadCredentialDatabase(std::vector<Credential>& creds)
+void loadCredentialDatabase(std::vector<Credential>& creds, std::string key)
 {
     try{
         std::ifstream vaultFile("vault.csv");
         std::string currLine;
+        std::getline(vaultFile, currLine);
 
         while (std::getline(vaultFile, currLine)){
             std::stringstream ss(currLine);
 
             Credential cred;
 
+
             std::getline(ss, cred.service, ',');
+            cred.service = xorEncryptionDecryption(cred.service, key);
             std::getline(ss, cred.username, ',');
+            cred.username = xorEncryptionDecryption(cred.username, key);
             std::getline(ss, cred.password, ',');
+            cred.password = xorEncryptionDecryption(cred.password, key);
 
             creds.push_back(cred);
 
@@ -90,10 +94,8 @@ void loadCredentialDatabase(std::vector<Credential>& creds)
 }
 
 void viewCredentials(std::vector<Credential>& creds){
-    for (const auto& [service, username, password] : creds) {
-        xorEncryptionDecryption(service);
-        xorEncryptionDecryption(username);
-        xorEncryptionDecryption(password);
+    for (auto& [service, username, password] : creds) {
+
     std::cout << service << "," << username << "," << password << "\n";
     }
     if (creds.empty()) {
@@ -101,12 +103,20 @@ void viewCredentials(std::vector<Credential>& creds){
     }
 }
 
-void xorEncryption(std::string input)
+std::string xorEncryptionDecryption(const std::string& data, const std::string& key)
 {
-    std::string password = "password";
-
-    for (int i = 0; i < input.length(); i++)
+    if (key.empty())
     {
-        input[i] = input[i] ^ password[i];
+        std::cout << "Key is empty" << std::endl;
+        return "";
     }
+    std::string result;
+
+    for (unsigned int i = 0; i < data.length(); i++)
+    {
+        result += data[i] ^ key[i % key.length()]; //loop with modulus
+
+    }
+
+    return result;
 }
