@@ -20,7 +20,7 @@ void createCredentialDatabase()
 }
 
 
-void saveCredentialsToDatabase(std::vector<Credential>& creds, std::string key)
+void saveCredentialsToDatabase(std::vector<Credential>& creds, std::string& key)
 {
     try
     {
@@ -32,6 +32,7 @@ void saveCredentialsToDatabase(std::vector<Credential>& creds, std::string key)
             std::string encryptedUser = xorEncryptionDecryption(username, key);
             std::string encryptedPassword = xorEncryptionDecryption(password, key);
             vaultFile << encryptedService << "," << encryptedUser << "," << encryptedPassword << "\n";
+            //std::cout << "data" << encryptedService << encryptedUser << encryptedPassword;
         }
 
         vaultFile.close();
@@ -49,13 +50,13 @@ void addCredentialEntryToMem(std::vector<Credential>& creds)
         Credential cred;
         std::cout << "What are these credentials for?";
         std::getline(std::cin, cred.service);//update service
-
+        //std::cout << cred.service << std::endl;
         std::cout << "Whats your username for this service?";
         std::getline(std::cin, cred.username);
-
+        //std::cout << cred.username << std::endl;
         std::cout << "Whats your password for this service?";
         std::getline(std::cin, cred.password);
-
+        //std::cout << cred.password << std::endl;
         creds.push_back(cred);
     }
     catch(...)
@@ -65,7 +66,7 @@ void addCredentialEntryToMem(std::vector<Credential>& creds)
 
 }
 
-void loadCredentialDatabase(std::vector<Credential>& creds, std::string key)
+void loadCredentialDatabase(std::vector<Credential>& creds, std::string& key)
 {
     try{
         std::ifstream vaultFile("vault.csv");
